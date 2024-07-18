@@ -3,6 +3,7 @@ package phat.code.baitappp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import phat.code.baitappp.model.Category;
@@ -10,74 +11,68 @@ import phat.code.baitappp.model.Product;
 import phat.code.baitappp.repository.CategoryRepository;
 import phat.code.baitappp.repository.ProductRepository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@CrossOrigin("*")
 public class ProductController {
     @Autowired
-    CategoryRepository categoryRepository;
-    @Autowired
     ProductRepository productRepository;
+
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public ResponseEntity findAll(){
+        return new  ResponseEntity<>(productRepository.findAll(), HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity getProductById(@PathVariable Long id) {
-        Product product = productRepository.findById(id).orElse(null);
-        if (product != null) {
-            return ResponseEntity.notFound().build();
-        }else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productRepository.save(product);
+    public ResponseEntity save(@RequestBody Product product){
+        productRepository.save(product);
+        return new ResponseEntity<>("Them thanh cong",HttpStatus.OK);
     }
-    @PutMapping("/{id}")
-    public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
+
+    @PutMapping("{id}")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody Product product){
         Product existingProduct = productRepository.findById(id).orElse(null);
         if (existingProduct != null) {
-            existingProduct.setName(productDetails.getName());
-            existingProduct.setPrice(productDetails.getPrice());
-            existingProduct.setAmount(productDetails.getAmount());
-            existingProduct.setCategory(productDetails.getCategory());
+            existingProduct.setName(product.getName());
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.setAmount(product.getAmount());
+            existingProduct.setCategory(product.getCategory());
             productRepository.save(existingProduct);
             return ResponseEntity.ok(existingProduct);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity delete(@PathVariable Long id){
         productRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
-    @GetMapping("/sortByPrice")
-    public List<Product> sortProductsByPrice() {
-        return productRepository.findAll(Sort.by(Sort.Direction.ASC, "price"));
+        return new ResponseEntity<>("Delete thanh cong",HttpStatus.OK);
     }
 
-    @GetMapping("/sortByAmount")
-    public List<Product> sortProductsByAmount() {
-        return productRepository.findAll(Sort.by(Sort.Direction.ASC, "amount"));
+    @GetMapping("/sortByPrice")
+    public ResponseEntity<List<Product>> sortByPrice() {
+        List<Product> products = productRepository.findAllByOrderByPriceDesc();
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @GetMapping("/searchByPriceRange")
-    public List<Product> searchByPriceRange(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
-        return productRepository.findByPriceRange(minPrice, maxPrice);
+    public ResponseEntity<List<Product>> search(@RequestParam double minPrice, @RequestParam double maxPrice) {
+        List<Product> products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
-
     @GetMapping("/searchByCategory")
-    public List<Product> searchByCategory(@RequestParam Long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElse(null);
-        return productRepository.findByCategory(category);
+    public ResponseEntity<List<Product>> findByCategory(@PathVariable Long categoryId) {
+        List<Product> products = productRepository.findByCategoryId(categoryId);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
-
     @GetMapping("/searchByName")
-    public List<Product> searchByName(@RequestParam String name) {
-        return productRepository.findByNameContaining(name);
+    public ResponseEntity<List<Product>> findByName(@RequestParam String name) {
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

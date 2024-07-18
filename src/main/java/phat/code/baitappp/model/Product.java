@@ -1,84 +1,41 @@
 package phat.code.baitappp.model;
-import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
 @Entity
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Double price;
-    private Integer amount;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
-
+    private double price;
+    private int amount;
+    private String createAt;
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+    private String updateAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updateAt = LocalDateTime.now();
-    }
-
-    public Product() {
-    }
-
-    public Product(Long id, String name, Double price, Integer amount, LocalDateTime createAt, LocalDateTime updateAt, Category category) {
+    public Product(Long id, String name, double price, int amount, String createAt, Category category, String updateAt) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.amount = amount;
         this.createAt = createAt;
-        this.updateAt = updateAt;
         this.category = category;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public Product() {
+
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public Long getId() {
+        return id;
     }
 
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -89,11 +46,43 @@ public class Product {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
+    public double getPrice() {
+        return price;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public String getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(String createAt) {
+        this.createAt = createAt;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public String getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(String updateAt) {
+        this.updateAt = updateAt;
     }
 }
